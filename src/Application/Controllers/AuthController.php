@@ -2,13 +2,11 @@
 
 namespace App\Application\Controllers;
 
-use Psr\Http\Message\ResponseInterface as Response;
 use App\Application\Models\User;
 use App\Application\Utils\Jwt;
-use Illuminate\Database\Capsule\Manager as Capsule; // Import Capsule
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\DatabasePresenceVerifier;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 class AuthController extends Controller
@@ -43,6 +41,13 @@ class AuthController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
+        if ($validator->fails()) {
+            return $this->respondWithData([
+                'error'  => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
         $user = User::where('email', $data['email'])->first();
 
         $valid = Hash::check($data['password'], $user->password);
@@ -53,12 +58,9 @@ class AuthController extends Controller
             ], 400);
         }
 
-        if ($validator->fails()) {
-            return $this->respondWithData([
-                'error'  => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 400);
-        }
+        // $user->last_login_at = (new Carbon())->now();
+        $user->last_login_at = Carbon::now();
+        $user->save();
 
         return $this->respondWithData([
             'token' => Jwt::tokenByUserId($user->id),
