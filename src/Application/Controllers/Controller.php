@@ -11,6 +11,14 @@ use Slim\Psr7\Response as SlimResponse;
 
 abstract class Controller
 {
+    protected function validationFail($validator)
+    {
+        return $this->respondWithData([
+            'error'   => 'Validation failed',
+            'errors'  => $validator->errors()
+        ], 400);
+    }
+
     /**
      * Helper method to respond with data.
      *
@@ -23,7 +31,7 @@ abstract class Controller
         $response = new SlimResponse();
         $response->getBody()->write(json_encode($data, JSON_PRETTY_PRINT));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus($status);
+            ->withStatus($status);
     }
 
     /**
@@ -39,7 +47,7 @@ abstract class Controller
         $errorData = ['error' => $error];
         $response->getBody()->write(json_encode($errorData, JSON_PRETTY_PRINT));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus($status);
+            ->withStatus($status);
     }
 
     /**

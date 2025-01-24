@@ -17,4 +17,5 @@ return [
     'numeric'   => 'The :attribute must be a number.',
     'boolean'   => 'The :attribute must be true or false.',
     'exists'    => 'The selected :attribute is invalid.',
+    'in'        => 'The selected :attribute is invalid. It must be one of the following: :values.',
 ];

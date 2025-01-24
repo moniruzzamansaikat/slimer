@@ -51,10 +51,7 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->respondWithData([
-                'error'   => 'Validation failed',
-                'errors'  => $validator->errors()
-            ], 400);
+            return $this->validationFail($validator);
         }
 
         $firstName = $data['first_name'] ?? null;

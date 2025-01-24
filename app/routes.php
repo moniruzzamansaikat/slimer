@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Application\Controllers\AuthController;
 use App\Application\Controllers\HomeController;
+use App\Application\Controllers\ProfileController;
 use App\Application\Controllers\UserController;
 use App\Application\Middleware\JwtMiddleware;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -31,6 +32,8 @@ return function (App $app): void {
         // all the routes after this must be authenticated 
         $group->group('', function (Group $group) {
             $group->get('/dashboard', [UserController::class, 'dashboard']);
+
+            $group->post('/profile', [ProfileController::class, 'updateProfile']);
 
             $group->group('/users', function (Group $group) {
                 $group->get('', [UserController::class, 'list']);
