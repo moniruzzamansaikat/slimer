@@ -19,6 +19,10 @@ class ProfileController extends Controller
             'phone_number'  => 'nullable|numeric',
             'date_of_birth' => 'nullable|date|min:3|max:50',
             'gender'        => 'nullable|in:male,female,other',
+            'city'          => 'nullable|string|max:50',
+            'state'         => 'nullable|string|max:50',
+            'country'       => 'nullable|string|max:50',
+            'zip_code'      => 'nullable|string|max:10',
         ]);
 
         if ($validator->fails()) {
@@ -31,6 +35,10 @@ class ProfileController extends Controller
         $user->phone_number  = $data->phone_number ?? null;
         $user->date_of_birth = $data->date_of_birth ?? null;
         $user->gender        = $data->gender ?? null;
+        $user->city          = $data->city ?? null;
+        $user->state         = $data->state ?? null;
+        $user->country       = $data->country ?? null;
+        $user->zip_code      = $data->zip_code ?? null;
         $user->save();
 
         return $this->respondWithData([
