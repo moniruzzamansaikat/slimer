@@ -6,6 +6,8 @@ use App\Application\Settings\SettingsInterface;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Validation\UncompromisedVerifier;
+use Illuminate\Validation\DatabasePresenceVerifier;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
@@ -38,10 +40,6 @@ return function (ContainerBuilder $containerBuilder) {
     $capsule->setAsGlobal();
     $capsule->bootEloquent();
 
-    // ------------- hash
-    // $container->instance('hash', new HashManager($container));
-    // ------------- end hash
-
     // ------------- db
     $container->instance('db', $capsule->getDatabaseManager());
     // ------------- end db
@@ -49,8 +47,17 @@ return function (ContainerBuilder $containerBuilder) {
     // ---- validator --- // 
     $loader           = new FileLoader(new Filesystem(), __DIR__ . '/../resources/lang');
     $translator       = new Translator($loader, 'en');
-    $validatorFactory = new ValidatorFactory($translator);
-    $container->instance('validator', $validatorFactory);
+
+    $container->singleton('validator', function ($app) use ($translator) {
+        $validatorFactory = new ValidatorFactory($translator);
+
+        $validatorFactory->setPresenceVerifier(
+            new DatabasePresenceVerifier($app['db'])
+        );
+
+        return $validatorFactory;
+    });
+
     // ---- end validator --- // 
 
     $containerBuilder->addDefinitions([
