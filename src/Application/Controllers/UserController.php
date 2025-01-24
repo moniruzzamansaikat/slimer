@@ -11,6 +11,15 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 class UserController extends Controller
 {
+    public function dashboard(Request $request)
+    {
+        $data = [
+            'user' => User::find($request->getAttribute('user')->id)
+        ];
+
+        return $this->respondWithData($data);
+    }
+
     public function list(Request $request): Response
     {
         $users = User::paginate();

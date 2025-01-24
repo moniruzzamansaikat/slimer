@@ -23,15 +23,20 @@ return function (App $app): void {
         });
 
 
-        // all the routes after this must be authenticated 
         $group->group('', function (Group $group) {
             $group->get('', [HomeController::class, 'index']);
         });
 
-        $group->group('/users', function (Group $group) {
-            $group->get('', [UserController::class, 'list']);
-            $group->post('', [UserController::class, 'store']);
-            $group->get('/{id}', [UserController::class, 'show']);
+
+        // all the routes after this must be authenticated 
+        $group->group('', function (Group $group) {
+            $group->get('/dashboard', [UserController::class, 'dashboard']);
+
+            $group->group('/users', function (Group $group) {
+                $group->get('', [UserController::class, 'list']);
+                $group->post('', [UserController::class, 'store']);
+                $group->get('/{id}', [UserController::class, 'show']);
+            });
         })->add(JwtMiddleware::class);
     });
 };
