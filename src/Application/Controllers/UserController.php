@@ -4,9 +4,7 @@ namespace App\Application\Controllers;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Application\Models\User;
-use Illuminate\Database\Capsule\Manager as Capsule; // Import Capsule
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\DatabasePresenceVerifier;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 class UserController extends Controller

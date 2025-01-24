@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Application\Controllers;
 
 use Psr\Http\Message\ResponseInterface as Response;
-use Slim\Exception\HttpBadRequestException;
 use Slim\Psr7\Response as SlimResponse;
 
 
