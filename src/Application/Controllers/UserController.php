@@ -11,11 +11,14 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 class UserController extends Controller
 {
-    public function list(): Response
+    public function list(Request $request): Response
     {
         $users = User::paginate();
 
-        return $this->respondWithData($users);
+        return $this->respondWithData([
+            'users' => $users,
+            'user'  => $request->getAttribute('user')
+        ]);
     }
 
     public function show(Request $request, $response, $args)
@@ -31,11 +34,10 @@ class UserController extends Controller
     {
         $data = $request->getParsedBody();
 
-        // Explicitly set the presence verifier using the Capsule instance
         $validator = Validator::make($data, [
             'first_name' => 'required|string|min:3|max:50',
             'last_name'  => 'required|string|min:3|max:50',
-            'email'      => 'required|email|unique:users,email', // Check unique email in users table
+            'email'      => 'required|email|unique:users,email',
             'password'   => 'required|string|min:8',
         ]);
 
@@ -59,7 +61,7 @@ class UserController extends Controller
             $user->password   = $password;
             $user->save();
 
-            return $this->respondWithData(['message' => 'User created successfully'], 201);
+            return $this->respondWithData(['message' => 'User created successfully', 'data' => $user], 201);
         } catch (\Exception $e) {
             return $this->respondWithData([
                 'error'   => 'Validation failed',

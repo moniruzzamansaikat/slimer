@@ -44,6 +44,12 @@ return function (ContainerBuilder $containerBuilder) {
     $container->instance('db', $capsule->getDatabaseManager());
     // ------------- end db
 
+    // hash 
+    $container->singleton('hash', function ($app) {
+        return new HashManager($app);
+    });
+    // end hash
+
     // ---- validator --- // 
     $loader           = new FileLoader(new Filesystem(), __DIR__ . '/../resources/lang');
     $translator       = new Translator($loader, 'en');
