@@ -5,29 +5,45 @@ declare(strict_types=1);
 use App\Application\Settings\SettingsInterface;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
+use Illuminate\Container\Container;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Hashing\HashManager;
+
 
 return function (ContainerBuilder $containerBuilder) {
+    $container = new Container();
+    $capsule   = new Capsule($container);
+
+    $capsule->addConnection([
+        'driver'    => 'mysql',
+        'host'      => env('DB_HOST'),
+        'database'  => env('DB_NAME'),
+        'username'  => env('DB_USERNAME'),
+        'password'  => env('DB_PASSWORD'),
+        'charset'   => 'utf8',
+        'collation' => 'utf8_unicode_ci',
+        'prefix'    => '',
+    ]);
+
+    $capsule->setAsGlobal();
+    $capsule->bootEloquent();
+
+    $container->instance('db', $capsule->getDatabaseManager());
+
     $containerBuilder->addDefinitions([
-        
-        
-        
-        /**
-         * Setup database connection using PDO
-         */
-        PDO::class => function () {
-            $dbHost     = $_ENV['DB_HOST'];
-            $dbName     = $_ENV['DB_NAME'];
-            $dbUser     = $_ENV['DB_USERNAME'];
-            $dbPassword = $_ENV['DB_PASSWORD'];
+        'container' => $container,
+    ]);
 
-            return new PDO("mysql:host={$dbHost};dbname={$dbName}", $dbUser, $dbPassword);
-        },
+    Facade::setFacadeApplication($container);
 
+    $containerBuilder->addDefinitions([
         /**
          * Logger interface
          */
