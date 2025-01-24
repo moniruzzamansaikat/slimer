@@ -29,7 +29,7 @@ class ProfileController extends Controller
             return $this->validationFail($validator);
         }
 
-        $user                = User::find($request->getAttribute('user')->id);
+        $user                = User::active()->find($request->getAttribute('user')->id);
         $user->first_name    = $data->first_name;
         $user->last_name     = $data->last_name;
         $user->phone_number  = $data->phone_number ?? null;
