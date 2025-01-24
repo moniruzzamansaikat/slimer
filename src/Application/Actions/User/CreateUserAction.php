@@ -6,38 +6,32 @@ namespace App\Application\Actions\User;
 
 use App\Application\Actions\Action;
 use App\Application\Models\User;
-use App\Application\Utils\Validator;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Psr\Http\Message\ResponseInterface as Response;
-use Respect\Validation\Validator as v;
-use PDO;
 
 class CreateUserAction extends Action
 {
-    private PDO $db;
-    private Validator $validator;
-
-    public function __construct(PDO $db, Validator $validator)
-    {
-        $this->db        = $db;
-        $this->validator = $validator;
-    }
-
     protected function action(): Response
     {
         $request = $this->request;
         $data    = $request->getParsedBody();
 
         $rules = [
-            'first_name' => v::notEmpty()->length(3, 50)->setName('First name'),
-            'last_name'  => v::notEmpty()->length(3, 50)->setName('Last name'),
-            'email'      => v::notEmpty()->email()->setName('Email'),
-            'password'   => v::notEmpty()->length(8, null)->setName('Password'),
+            'first_name' => 'required|string|min:3|max:50',
+            'last_name'  => 'required|string|min:3|max:50',
+            'email'      => 'required|email',
+            'password'   => 'required|string|min:8',
         ];
 
-        if (!$this->validator->validate($data, $rules)) {
+        $validation = Validator::make($data, $rules, [
+            'last_name.required' => 'Last Name is requried'
+        ]);
+
+        if ($validation->fails()) {
             return $this->respondWithData([
                 'error'   => 'Validation failed',
-                'errors' => $this->validator->getErrors(),
+                'errors' => $validation->errors()
             ], 400);
         }
 

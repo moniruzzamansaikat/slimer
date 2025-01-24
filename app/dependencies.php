@@ -14,8 +14,11 @@ use Psr\Log\LoggerInterface;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Hashing\HashManager;
-
+use Illuminate\Translation\FileLoader;
+use Illuminate\Translation\Translator;
+use Illuminate\Validation\Factory as ValidatorFactory;
 
 return function (ContainerBuilder $containerBuilder) {
     $container = new Container();
@@ -35,7 +38,20 @@ return function (ContainerBuilder $containerBuilder) {
     $capsule->setAsGlobal();
     $capsule->bootEloquent();
 
+    // ------------- hash
+    // $container->instance('hash', new HashManager($container));
+    // ------------- end hash
+
+    // ------------- db
     $container->instance('db', $capsule->getDatabaseManager());
+    // ------------- end db
+
+    // ---- validator --- // 
+    $loader           = new FileLoader(new Filesystem(), __DIR__ . '/../resources/lang');
+    $translator       = new Translator($loader, 'en');
+    $validatorFactory = new ValidatorFactory($translator);
+    $container->instance('validator', $validatorFactory);
+    // ---- end validator --- // 
 
     $containerBuilder->addDefinitions([
         'container' => $container,

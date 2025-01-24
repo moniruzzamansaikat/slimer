@@ -16,8 +16,8 @@ class ListUsersAction extends UserAction
      */
     protected function action(): Response
     {
-        // $users = User::all();
-        $users = DB::table('users')->get();
+        $users = User::paginate();
+        // $users = DB::table('users')->paginate();
 
         return $this->respondWithData($users);
     }
